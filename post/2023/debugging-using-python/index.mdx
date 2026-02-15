@@ -1,0 +1,129 @@
+---
+title: "Faster and Easier Python Debugging with breakpoint() and PDB"
+tags: ["Python", "Workflow", "Productivity", "Debugging"]
+date: "2023-05-08"
+heroImage: /images/python-debug-header.svg
+published: true
+---
+
+Debugging is an essential skill for any software developer.
+It allows us to find and fix errors in our code, improve quality and performance, and learn from our mistakes.
+
+One of the most common and powerful tools for debugging Python code is the [Python Debugger (PDB)](https://docs.python.org/3/library/pdb.html).
+PDB is a module that provides an interactive command-line interface for inspecting and manipulating the state of a running program.
+With PDB, we can set breakpoints, step through the code line by line, examine variables and expressions, modify values, and more.
+
+However, using PDB can also be cumbersome and tedious.
+To invoke PDB, we need to import the pdb module and insert a `pdb.set_trace()` statement in our code where we want to pause the execution and enter the debugger.
+
+```python
+import pdb
+
+def add(a: int, b:int) -> int:
+  pdb.set_trace()  # pause here and enter the debugger
+  return a + b
+
+print(add(1, 2))
+```
+
+This means we have to modify our source code every time we want to debug it and remember to remove or comment out the pdb statements when we are done.
+Moreover, if we want to use a different debugger than PDB, such as IPython or PuDB, we have to change the import statement and the function call accordingly.
+
+Fortunately, [Python 3.7](https://peps.python.org/pep-0553/) introduced a new built-in function that simplifies this process: `breakpoint()`.
+The `breakpoint()` function is a convenient way to start a debugger at any point in our code without having to import anything or write debugger-specific code.
+All we have to do is insert a `breakpoint()` statement where we want to pause the execution and enter the debugger!
+
+In this article, we will learn what `breakpoint()` is, how to use it with PDB and other debuggers, and how to change its behavior with environment variables.
+
+## Using breakpoint()
+
+When using PDB, we need to learn a couple commands to interact with the debugger.
+There is a long list of commands PDB gives us, but we only need to know a few of them to get started.
+For example, if we want to print values we use the `p` command.
+If we want to execute the next line of code we use the `n` or `next` command.
+To continue execution until the next breakpoint we use the `c` or `continue` command.
+Finally, the `l` or `list` command shows us the code around the current line we are debugging.
+
+| Command             | Description                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `p [variable_name]` | Print the value of a expression.                                                                                                |
+| `n` or `next`       | Continue execution until the next line in the current function is reached or it returns.                                        |
+| `s` or `step`       | Execute the current line, stop at the first possible occasion (either in a function that is called or in the current function). |
+| `c` or `continue`   | Continue execution, only stop when a breakpoint is encountered.                                                                 |
+| `l` or `list`       | List source code for the current file.                                                                                          |
+| `h` or `help`       | Prints a list of commands we can use with PDB.                                                                                  |
+
+Let's see how `breakpoint()` works.
+Below is a recursive function that calculates the factorial of a given number.
+I've added a `breakpoint()` statement to the function so we can pause the execution and enter the debugger.
+
+```python
+# main.py
+
+def factorial(number: int) -> int:
+  if number < 0:
+    raise ValueError("`n` must be non-negative.")
+  elif number <= 1:
+    return 1
+  else:
+    breakpoint()  # pause here and enter the debugger
+    return number * factorial(number - 1)
+
+
+# factorial(5) is: 5 * 4 * 3 * 2 * 1 = 120
+print(factorial(5))
+```
+
+When we run this code, the program will stop at the `breakpoint()` statement and launch the default debugger, which is PDB by default.
+We can then use the PDB commands to inspect and manipulate the program state.
+
+<iframe
+  src="https://replit.com/@DylanPaulus/factorial-breakpoint?embed=true#main.py"
+  width="100%"
+  height="600"
+/>
+<a
+  href="https://replit.com/@DylanPaulus/factorial-breakpoint#main.py"
+  target="_blank"
+  class="text-sm text-center text-white transition hover:text-white hover:bg-slate-700 rounded-b bg-slate-600 pt-4">
+  Open in new window
+</a>
+
+<figcaption class="text-sm my-4 text-center">
+<ul>
+  Play with PDB by clicking green "Run" button near the top right of the
+  code editor.
+
+If you want to navigate back to the code, click "Show files" at the top left
+of the code editor and select "main.py".
+
+</ul>
+
+</figcaption>
+
+We can see that `breakpoint()` pauses the execution at the line where it is called.
+By using the commands we learned above, we can inspect the program state (`p number` to see the value of `n`) and step through the code line by line (`s`).
+
+## Changing the debugger behavior
+
+One of the advantages of using `breakpoint()` over `pdb.set_trace()` is that we can switch to a different debugger at any time.
+By setting the `PYTHONBREAKPOINT` environment variable we can tell Python which debugger we would like to use.
+For example, if we want to use IPython as our debugger, we can run:
+
+```bash
+$ export PYTHONBREAKPOINT=IPython.core.debugger.set_trace
+$ python3 main.py
+```
+
+Another advantage of using `breakpoint()` is that we can disable all breakpoints in our code by setting the `PYTHONBREAKPOINT` environment variable to 0.
+This is useful when we want to run our code without entering the debugger; without having to remove or comment out all the `breakpoint()` statements.
+
+```bash
+$ export PYTHONBREAKPOINT=0
+$ python3 main.py
+```
+
+## End
+
+`breakpoint()` is a much needed improvement over `pdb.set_trace()`!
+It gives us the ability to quickly debug our code, and easily switch between different debuggers.
