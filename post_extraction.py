@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import Iterator
 
-from .models import Post
+from models import Post
 
 
 def find_markdown_files(base_dir: Path) -> Iterator[Path]:

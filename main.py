@@ -10,9 +10,8 @@ import chromadb
 from chromadb.api.types import QueryResult
 from openai import OpenAI
 
+from models import Post
 from post_extraction import read_posts
-
-from .models import Post
 
 client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 chroma_client = chromadb.HttpClient(host="localhost", port=8000)
